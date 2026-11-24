@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Edit Student</h1>
+<div class="card">
+  <form method="post">
+    <input name="name" value="{{ student.name }}" required>
+    <button type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

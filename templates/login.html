@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card center">
+  <h2>Admin Login</h2>
+  <form method="post">
+    <input name="username" placeholder="Username" required>
+    <input name="password" placeholder="Password" type="password" required>
+    <button type="submit">Login</button>
+  </form>
+  <p>Default admin: <strong>admin</strong> / <strong>password</strong> — change it after login.</p>
+</div>
+{% endblock %}

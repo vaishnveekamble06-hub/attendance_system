@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+<div class="grid">
+  <div class="card">
+    <h3>Today's Attendance ({{ today }})</h3>
+    <form method="get" action="{{ url_for('attendance') }}">
+      <button type="submit">Mark / Edit Today's Attendance</button>
+    </form>
+    <ul>
+    {% for sid, present in todays_attendance.items() %}
+      <li>{{ system.get_student_by_id(sid).name if system.get_student_by_id(sid) else sid }}: {{ 'Present' if present else 'Absent' }}</li>
+    {% endfor %}
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Attendance Percentage</h3>
+    <ul>
+    {% for name, pct in percentages.items() %}
+      <li>{{ name }} — {{ pct }}%</li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

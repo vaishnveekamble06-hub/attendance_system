@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Mark Attendance</h1>
+<form method="post" class="card">
+  {% for s in students %}
+    <label class="check"><input type="checkbox" name="present" value="{{ s.id }}"> {{ s.name }}</label><br>
+  {% endfor %}
+  <button type="submit">Save Attendance for Today</button>
+</form>
+{% endblock %}

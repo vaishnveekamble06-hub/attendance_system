@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Attendance History</h1>
+{% for date, rec in history.items()|reverse %}
+  <div class="card">
+    <h3>{{ date }}</h3>
+    <ul>
+      {% for sid, present in rec.items() %}
+        <li>{{ system.get_student_by_id(sid).name if system.get_student_by_id(sid) else sid }} — {{ 'Present' if present else 'Absent' }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endfor %}
+{% endblock %}

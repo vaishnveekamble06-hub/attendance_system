@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Students</h1>
+<a class="btn" href="{{ url_for('add_student') }}">Add Student</a>
+<table>
+  <tr><th>Name</th><th>Actions</th></tr>
+  {% for s in students %}
+  <tr>
+    <td>{{ s.name }}</td>
+    <td>
+      <a href="{{ url_for('edit_student', student_id=s.id) }}">Edit</a>
+      <form style="display:inline" method="post" action="{{ url_for('delete_student', student_id=s.id) }}">
+        <button type="submit" onclick="return confirm('Delete this student?')">Delete</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

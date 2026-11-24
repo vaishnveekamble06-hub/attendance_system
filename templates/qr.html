@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>QR Scanner (Mark Attendance)</h1>
+<p>Scan a student's QR code (their student ID) to toggle their presence for today.</p>
+<div id="reader" style="width:100%"></div>
+<p id="status"></p>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+<script>
+const html5QrCode = new Html5Qrcode("reader");
+function onScanSuccess(decodedText, decodedResult) {
+  // decodedText expected to be student id
+  fetch('/qr_toggle', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({id: decodedText})
+  }).then(r=>r.json()).then(j=>{
+    document.getElementById('status').innerText = j.message;
+  });
+}
+Html5Qrcode.getCameras().then(devices => {
+    if (devices && devices.length) {
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10 },
+            onScanSuccess);
+    }
+}).catch(err=>{ document.getElementById('status').innerText = 'Camera error: '+err; });
+</script>
+{% endblock %}
