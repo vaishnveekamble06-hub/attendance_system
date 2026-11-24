@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, s
 from attendance import AttendanceSystem
 from werkzeug.security import check_password_hash, generate_password_hash
 import io
+import json
 
 app = Flask(__name__)
 app.secret_key = 'change_this_secret'  # change before deploying
@@ -41,7 +42,7 @@ def dashboard():
     percentages = system.get_attendance_percentage()
     today = system.get_today_str()
     todays_attendance = system.get_attendance_for_date(today)
-    return render_template('index.html', students=students, percentages=percentages, today=today, todays_attendance=todays_attendance)
+    return render_template('index.html', students=students, percentages=percentages, today=today, todays_attendance=todays_attendance, system=system)
 
 @app.route('/students')
 @login_required
@@ -109,9 +110,6 @@ def qr():
     students = system.get_students()
     return render_template('qr.html', students=students)
 
-if __name__ == '__main__':
-    app.run(debug=True)
-
 # QR toggle endpoint
 @app.route('/qr_toggle', methods=['POST'])
 @login_required
@@ -135,3 +133,6 @@ def qr_toggle():
 @app.context_processor
 def inject_system():
     return dict(system=system)
+
+if __name__ == '__main__':
+    app.run(debug=True)
