@@ -1,26 +1,100 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Dashboard</h1>
-<div class="grid">
-  <div class="card">
-    <h3>Today's Attendance ({{ today }})</h3>
-    <form method="get" action="{{ url_for('attendance') }}">
-      <button type="submit">Mark / Edit Today's Attendance</button>
-    </form>
-    <ul>
-    {% for sid, present in todays_attendance.items() %}
-      <li>{{ system.get_student_by_id(sid).name if system.get_student_by_id(sid) else sid }}: {{ 'Present' if present else 'Absent' }}</li>
-    {% endfor %}
-    </ul>
-  </div>
 
-  <div class="card">
-    <h3>Attendance Percentage</h3>
-    <ul>
-    {% for name, pct in percentages.items() %}
-      <li>{{ name }} — {{ pct }}%</li>
-    {% endfor %}
-    </ul>
+<div class="dash-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="subtitle">Overview for {{ today }}</p>
+  </div>
+  <div class="dash-actions">
+    <a href="{{ url_for('qr') }}" class="btn btn-secondary">Scan QR</a>
+    <a href="{{ url_for('attendance') }}" class="btn">Mark Attendance</a>
   </div>
 </div>
+
+<!-- Top Summary Stat Cards -->
+{% set total_students = students|length %}
+{% set present_count = todays_attendance.values()|select('equalto', True)|list|length %}
+{% set absent_count = total_students - present_count if todays_attendance else 0 %}
+{% set today_rate = ((present_count / total_students) * 100)|round(1) if total_students > 0 else 0 %}
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <span class="stat-label">Total Students</span>
+    <span class="stat-value">{{ total_students }}</span>
+  </div>
+  <div class="stat-card stat-green">
+    <span class="stat-label">Present Today</span>
+    <span class="stat-value">{{ present_count }}</span>
+  </div>
+  <div class="stat-card stat-red">
+    <span class="stat-label">Absent Today</span>
+    <span class="stat-value">{{ absent_count }}</span>
+  </div>
+  <div class="stat-card stat-indigo">
+    <span class="stat-label">Today's Rate</span>
+    <span class="stat-value">{{ today_rate }}%</span>
+  </div>
+</div>
+
+<!-- Main Two-Column Section -->
+<div class="grid">
+  <!-- Card 1: Today's Attendance with Status Pills -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Today's Attendance</h3>
+      <span class="date-chip">{{ today }}</span>
+    </div>
+
+    {% if todays_attendance %}
+      <ul class="status-list">
+      {% for sid, present in todays_attendance.items() %}
+        {% set st = system.get_student_by_id(sid) %}
+        <li>
+          <span class="student-name">{{ st.name if st else sid }}</span>
+          {% if present %}
+            <span class="badge badge-present">Present</span>
+          {% else %}
+            <span class="badge badge-absent">Absent</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <p>No attendance marked yet for today.</p>
+        <a href="{{ url_for('attendance') }}" class="btn">Mark Now</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Card 2: Overall Attendance Percentage with Visual Progress Bars -->
+  <div class="card">
+    <div class="card-header">
+      <h3>Overall Attendance %</h3>
+      <a href="{{ url_for('export') }}" class="link-sm">Export Excel ↓</a>
+    </div>
+
+    {% if percentages %}
+      <ul class="progress-list">
+      {% for name, pct in percentages.items() %}
+        <li class="progress-item">
+          <div class="progress-top">
+            <span class="student-name">{{ name }}</span>
+            <span class="pct-text {{ 'low-pct' if pct < 75 else 'good-pct' }}">{{ pct }}%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill {{ 'fill-danger' if pct < 75 else 'fill-success' }}" style="width: {{ pct }}%;"></div>
+          </div>
+        </li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <p>Add students and mark attendance to see percentages.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
 {% endblock %}
